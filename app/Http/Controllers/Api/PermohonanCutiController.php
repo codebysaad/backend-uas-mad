@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Models\PermohonanCuti;
@@ -8,8 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class PermohonanCutiController extends Controller
 {
@@ -21,7 +19,8 @@ class PermohonanCutiController extends Controller
     public function index(){
         //get attendance
         $id = Auth::user()->id;
-        $permohonanCuti = PermohonanCuti::where('id_user','=',$id)
+        $permohonanCuti = PermohonanCuti::join('jeniscuti','permohonan_cutis.jns_cuti','=','jeniscuti.id')
+        ->where('permohonan_cutis.id_user','=',$id)
         ->orderBy('created_at','DESC')
         ->get();
 
@@ -39,6 +38,7 @@ class PermohonanCutiController extends Controller
         //validate rules input
         $validator = Validator::make($request->all(), [
             'alasan' => 'required',
+            'jns_cuti' => 'required',
             'tgl_awal' => 'required',
             'tgl_akhir' => 'required',
         ]);
@@ -51,6 +51,7 @@ class PermohonanCutiController extends Controller
         //create post attendance
         $attendance = PermohonanCuti::create([
             'id_user'    => $user->id,
+            'jns_cuti' => $request->jns_cuti,
             'alasan'      => $request->alasan,
             'tgl_awal'     => $request->tgl_awal,
             'tgl_akhir'      => $request->tgl_akhir,
@@ -60,9 +61,9 @@ class PermohonanCutiController extends Controller
 
         if($attendance) {
             //return response
-            return new PostResource(true, 'Attendance successful', $attendance);
+            return new PostResource(true, 'Permohonan cuti successful', $attendance);
         } else {
-            return new PostResource(false, 'Attendance unsuccessful', null);
+            return new PostResource(false, 'Permohonan cuti unsuccessful', null);
         }
     }
 
@@ -73,7 +74,7 @@ class PermohonanCutiController extends Controller
      * @return void
      */
     public function show(PermohonanCuti $permohonanCuti){
-        return new PostResource(true, 'Permohonan founded!', $permohonanCuti);
+        return new PostResource(true, 'Permohonan cuti founded!', $permohonanCuti);
     }
 
     /**
@@ -85,6 +86,10 @@ class PermohonanCutiController extends Controller
      */
     public function update(Request $request, PermohonanCuti $permohonanCuti){
         $validator = Validator::make($request->all(), [
+            'alasan' => 'required',
+            'jns_cuti' => 'required',
+            'tgl_awal' => 'required',
+            'tgl_akhir' => 'required',
             'status'      => 'required',
             'tgl_status'       => 'required',
         ]);
@@ -94,6 +99,10 @@ class PermohonanCutiController extends Controller
         }
 
         $permohonanCuti->update([
+            'jns_cuti' => $request->jns_cuti,
+            'alasan'      => $request->alasan,
+            'tgl_awal'     => $request->tgl_awal,
+            'tgl_akhir'      => $request->tgl_akhir,
             'status'  => $request->status,
             'tgl_status'    => $request->tgl_status,
         ]);
