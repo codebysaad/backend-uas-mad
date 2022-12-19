@@ -4,7 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
-use App\Models\PermohonanCuti;
+use App\Http\Controllers\Api\JenisCutiController;
+use App\Http\Controllers\Api\PegawaiController;
+use App\Http\Controllers\Api\PermohonanCutiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +26,9 @@ Route::controller(AuthController::class)->group(function() {
     Route::middleware('auth:sanctum')->group(function() {
 
         Route::apiResource('/attendance', AttendanceController::class);
-        Route::apiResource('/cuti', PermohonanCuti::class);
+        Route::apiResource('/cuti', PermohonanCutiController::class);
+        Route::apiResource('/pegawai', PegawaiController::class);
+        Route::apiResource('/jeniscuti', JenisCutiController::class);
         
         Route::prefix('/profile')->group(function() {
             Route::get('/', 'profile');

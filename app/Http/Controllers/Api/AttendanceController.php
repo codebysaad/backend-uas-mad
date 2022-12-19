@@ -153,9 +153,13 @@ class AttendanceController extends Controller
         Storage::delete('public/attendance/'.$attendance->photo);
 
         //delete post
-        $attendance->delete();
+        $delete = $attendance->delete();
 
         //return response
-        return new PostResource(true, 'Attendance Deleted!', null);
+        if($delete){
+            return new PostResource($delete, 'Attendance Deleted!', null);
+        }else{
+            return new PostResource($delete, 'Attendance Delete Failed!', null);
+        }
     }
 }

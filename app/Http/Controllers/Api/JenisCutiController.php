@@ -70,11 +70,10 @@ class JenisCutiController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function update(Request $request, JenisCuti $jnsCuti){
-        //get current user
-        $user = Auth::user();
+    public function update(Request $request){
         //input rules
         $validator = Validator::make($request->all(), [
+            'id'              => 'required',
             'jenis_cuti'      => 'required',
             'deskripsi'       => 'required',
         ]);
@@ -83,12 +82,17 @@ class JenisCutiController extends Controller
             return response()->json($validator->errors(), 422);
         }
         //update post without image
-        $jnsCuti->update([
+        $updated = JenisCuti::where('id', $request->id)
+        ->update([
             'jenis_cuti'    => $request->jenis_cuti,
             'deskripsi'      => $request->deskripsi,
         ]);
 
-        return new PostResource(true, 'Jenis Cuti Updated!', $jnsCuti);
+        if($updated) {
+            return new PostResource(true, 'Jenis Cuti Updated!', $updated);
+        } else {
+            return new PostResource(false, 'Jenis Cuti Gagal Updated!', null);
+        }
     }
 
     /**
@@ -97,11 +101,16 @@ class JenisCutiController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function destroy(JenisCuti $jnsCuti){
+    public function destroy(Request $request){
         //delete post
-        $jnsCuti->delete();
+        // $delete = $jnsCuti->delete();
+        $delete = JenisCuti::where('id', $request->id)->delete();
 
         //return response
-        return new PostResource(true, 'Jenis Cuti Deleted!', null);
+        if($delete) {
+            return new PostResource(true, 'Jenis Cuti Deleted!', null);
+        } else {
+            return new PostResource(false, 'Jenis Cuti Gagal Deleted!', null);
+        }
     }
 }

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Notifications\WelcomeEmailNotification;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\PostResource;
 
@@ -43,8 +42,8 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            // 'photo'         => $filePath ?? null,
-            'photo'         => $photo->hashName(),
+            'photo'         => $filePath ?? null,
+            // 'photo'         => $photo->hashName(),
             'name'          => $request->name,
             'email'         => $request->email,
             'phone_number'  => $phone_number,

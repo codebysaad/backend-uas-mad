@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class PermohonanCutiController extends Controller
 {
@@ -21,7 +22,7 @@ class PermohonanCutiController extends Controller
         $id = Auth::user()->id;
         $permohonanCuti = PermohonanCuti::join('jeniscuti','permohonan_cutis.jns_cuti','=','jeniscuti.id')
         ->where('permohonan_cutis.id_user','=',$id)
-        ->orderBy('created_at','DESC')
+        ->orderBy('permohonan_cutis.created_at','DESC')
         ->get();
 
         return new PostResource(true, 'List Permohonan Cuti', $permohonanCuti);
@@ -48,20 +49,20 @@ class PermohonanCutiController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        //create post attendance
-        $attendance = PermohonanCuti::create([
+        //create post cuti
+        $cuti = PermohonanCuti::create([
             'id_user'    => $user->id,
             'jns_cuti' => $request->jns_cuti,
             'alasan'      => $request->alasan,
             'tgl_awal'     => $request->tgl_awal,
             'tgl_akhir'      => $request->tgl_akhir,
-            'status'       => "pending",
+            'status'       => false,
             'tgl_status'      => null,
         ]);
 
-        if($attendance) {
+        if($cuti) {
             //return response
-            return new PostResource(true, 'Permohonan cuti successful', $attendance);
+            return new PostResource(true, 'Permohonan cuti successful', $cuti);
         } else {
             return new PostResource(false, 'Permohonan cuti unsuccessful', null);
         }
@@ -84,30 +85,37 @@ class PermohonanCutiController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function update(Request $request, PermohonanCuti $permohonanCuti){
+    public function update(Request $request){
         $validator = Validator::make($request->all(), [
+            'id'     => 'required',
             'alasan' => 'required',
             'jns_cuti' => 'required',
             'tgl_awal' => 'required',
             'tgl_akhir' => 'required',
             'status'      => 'required',
-            'tgl_status'       => 'required',
         ]);
         //if validator fail
         if($validator->fails()){
             return response()->json($validator->errors(), 422);
         }
 
-        $permohonanCuti->update([
+        $date = Carbon::now()->format('Y-m-d');
+
+        $updated = PermohonanCuti::where('id',$request->id)
+        ->update([
             'jns_cuti' => $request->jns_cuti,
             'alasan'      => $request->alasan,
             'tgl_awal'     => $request->tgl_awal,
             'tgl_akhir'      => $request->tgl_akhir,
             'status'  => $request->status,
-            'tgl_status'    => $request->tgl_status,
+            'tgl_status'    => $date,
         ]);
 
-        return new PostResource(true, 'Cuti Updated!', $permohonanCuti);
+        if($updated) {
+            return new PostResource(true, 'Cuti Updated!', $updated);
+        } else {
+            return new PostResource(false, 'Cuti Gagal Updated!', null);
+        }
     }
 
     /**
@@ -116,11 +124,16 @@ class PermohonanCutiController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function destroy(PermohonanCuti $permohonanCuti){
+    public function destroy(Request $request){
         //delete post
-        $permohonanCuti->delete();
+        $delete = PermohonanCuti::where('id',$request->id)
+        ->delete();
 
         //return response
-        return new PostResource(true, 'Cuti Deleted!', null);
+        if($delete) {
+            return new PostResource(true, 'Permohonan Cuti Deleted!', $delete);
+        } else {
+            return new PostResource(false, 'Permohonan Cuti Gagal Deleted!', null);
+        }
     }
 }
