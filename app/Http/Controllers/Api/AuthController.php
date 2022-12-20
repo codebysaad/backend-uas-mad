@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 use App\Http\Resources\PostResource;
 
 class AuthController extends Controller
@@ -26,6 +26,7 @@ class AuthController extends Controller
         }
 
         $photo = $request->file('photo');
+        // $photo->storeAs('public/attendance', $photo->hashName());
 
         if ($photo) {
             $fileName = time().'_'.$photo->getClientOriginalName();

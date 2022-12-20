@@ -20,7 +20,8 @@ class PermohonanCutiController extends Controller
     public function index(){
         //get attendance
         $id = Auth::user()->id;
-        $permohonanCuti = PermohonanCuti::join('jeniscuti','permohonan_cutis.jns_cuti','=','jeniscuti.id')
+        $permohonanCuti = PermohonanCuti::select('permohonan_cutis.id','permohonan_cutis.jns_cuti','permohonan_cutis.alasan','permohonan_cutis.tgl_awal','permohonan_cutis.tgl_akhir','permohonan_cutis.status','permohonan_cutis.tgl_status','permohonan_cutis.created_at','permohonan_cutis.updated_at','jeniscuti.jenis_cuti','jeniscuti.deskripsi')
+        ->join('jeniscuti','permohonan_cutis.jns_cuti','=','jeniscuti.id')
         ->where('permohonan_cutis.id_user','=',$id)
         ->orderBy('permohonan_cutis.created_at','DESC')
         ->get();
@@ -49,6 +50,8 @@ class PermohonanCutiController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $date = Carbon::now()->format('Y-m-d');
+
         //create post cuti
         $cuti = PermohonanCuti::create([
             'id_user'    => $user->id,
@@ -57,7 +60,7 @@ class PermohonanCutiController extends Controller
             'tgl_awal'     => $request->tgl_awal,
             'tgl_akhir'      => $request->tgl_akhir,
             'status'       => false,
-            'tgl_status'      => null,
+            'tgl_status'      => $date,
         ]);
 
         if($cuti) {
@@ -128,6 +131,7 @@ class PermohonanCutiController extends Controller
         //delete post
         $delete = PermohonanCuti::where('id',$request->id)
         ->delete();
+        // $delete = $permohonanCuti->delete();
 
         //return response
         if($delete) {

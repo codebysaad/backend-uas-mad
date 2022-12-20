@@ -20,9 +20,10 @@ class PegawaiController extends Controller
     public function index(){
         //get attendance
         $id = Auth::user()->id;
-        $pegawai = User::join('pegawais','users.id','=','pegawais.id_user')
+        $pegawai = User::select('pegawais.id','pegawais.id_user','pegawais.nama_lengkap','pegawais.alamat','pegawais.tmpt_lahir','pegawais.tgl_lahir','users.phone_number','users.role','users.email',)
+        ->join('pegawais','users.id','=','pegawais.id_user')
         ->where('pegawais.id_user','=',$id)
-        ->orderBy('created_at','DESC')
+        ->orderBy('pegawais.created_at','DESC')
         ->get();
 
         return new PostResource(true, 'Data Pegawai', $pegawai);
@@ -38,7 +39,6 @@ class PegawaiController extends Controller
         $user = Auth::user();
         //validate rules input
         $validator = Validator::make($request->all(), [
-            'id_user' => 'required',
             'nama_lengkap' => 'required',
             'alamat' => 'required',
             'tmpt_lahir' => 'required',
