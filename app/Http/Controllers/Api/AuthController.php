@@ -43,8 +43,8 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'photo'         => $filePath ?? null,
-            // 'photo'         => $photo->hashName(),
+            // 'photo'         => $filePath ?? null,
+            'photo'         => $fileName ?? null,
             'name'          => $request->name,
             'email'         => $request->email,
             'phone_number'  => $phone_number,
