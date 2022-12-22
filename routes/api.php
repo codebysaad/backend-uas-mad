@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\JenisCutiController;
 use App\Http\Controllers\Api\PegawaiController;
 use App\Http\Controllers\Api\PermohonanCutiController;
+use App\Http\Controllers\Api\JabatanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +29,7 @@ Route::controller(AuthController::class)->group(function() {
         Route::apiResource('/cuti', PermohonanCutiController::class);
         Route::apiResource('/pegawai', PegawaiController::class);
         Route::apiResource('/jeniscuti', JenisCutiController::class);
+        Route::apiResource('/jabatan', JabatanController::class);
         
         Route::prefix('/profile')->group(function() {
             Route::get('/', 'profile');

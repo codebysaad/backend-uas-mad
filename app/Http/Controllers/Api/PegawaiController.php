@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use App\Models\Pegawai;
-use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,8 +19,9 @@ class PegawaiController extends Controller
     public function index(){
         //get attendance
         $id = Auth::user()->id;
-        $pegawai = User::select('pegawais.id','pegawais.id_user','pegawais.nama_lengkap','pegawais.alamat','pegawais.tmpt_lahir','pegawais.tgl_lahir','users.phone_number','users.role','users.email',)
-        ->join('pegawais','users.id','=','pegawais.id_user')
+        $pegawai = Pegawai::select('pegawais.id','pegawais.id_user','pegawais.nama_lengkap','pegawais.alamat','pegawais.tmpt_lahir','pegawais.tgl_lahir','users.phone_number','users.role','users.email','pegawais.id_Jabatan','jabatans.nama_jabatan','jabatans.tugas')
+        ->join('users','pegawais.id_user','=','users.id')
+        ->join('jabatans', 'pegawais.id_jabatan','=','jabatans.id')
         ->where('pegawais.id_user','=',$id)
         ->orderBy('pegawais.created_at','DESC')
         ->get();
@@ -39,6 +39,7 @@ class PegawaiController extends Controller
         $user = Auth::user();
         //validate rules input
         $validator = Validator::make($request->all(), [
+            'id_jabatan' => 'required',
             'nama_lengkap' => 'required',
             'alamat' => 'required',
             'tmpt_lahir' => 'required',
@@ -53,6 +54,7 @@ class PegawaiController extends Controller
         //create post attendance
         $pegawai = Pegawai::create([
             'id_user'    => $user->id,
+            'id_jabatan' => $request->id_jabatan,
             'nama_lengkap' => $request->nama_lengkap,
             'alamat'      => $request->alamat,
             'tmpt_lahir'     => $request->tmpt_lahir,
@@ -87,6 +89,7 @@ class PegawaiController extends Controller
     public function update(Request $request){
         $validator = Validator::make($request->all(), [
             'id'        => 'required',
+            'id_jabatan' => 'required',
             'nama_lengkap' => 'required',
             'alamat' => 'required',
             'tmpt_lahir' => 'required',
@@ -99,6 +102,7 @@ class PegawaiController extends Controller
 
         $updated = Pegawai::where('id', $request->id)
         ->update([
+            'id_jabatan' => $request->id_jabatan,
             'nama_lengkap' => $request->nama_lengkap,
             'alamat'      => $request->alamat,
             'tmpt_lahir'     => $request->tmpt_lahir,
